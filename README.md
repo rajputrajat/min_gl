@@ -11,7 +11,7 @@ and terminates necessary stuff as a smart pointer. Hence, in the lifetime of the
 
 ## Example
 
-```
+```rust
 use glfw::WindowEvent;
 use min_gl::{gl, Display, Options};
 
