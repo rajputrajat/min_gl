@@ -3,7 +3,7 @@
 ---
 
 This is a small library that brings together **glfw** and **glad** to handle
-boiler plate code. The user only needs to create a `Display`, which initializes
+boilerplate code. The user only needs to create a `Display`, which initializes
 and terminates necessary stuff as a smart pointer. Hence, in the lifetime of the
 `Display`, **OpenGL** calls can be freely made without any other setup.
 
