@@ -1,6 +1,6 @@
 [package]
 name = "min_gl"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Cem Geçgel <gecgelcem@outlook.com>"]
 edition = "2021"
 description = "Minimal boilerplate code for OpenGL applications with glfw and glad."
