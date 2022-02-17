@@ -26,9 +26,11 @@ pub struct Options {
     /// Meaningfull when not in fullscreen mode.
     pub decorated: bool,
     /// Amount of fragments per pixel.
-    /// Gives smoother edges, but costly.
+    /// Gives high quality smoother edges, but costly.
     /// Must be powers of 2 (I guess).
-    pub samples: u32,
+    /// Consider `Some(4)` for good quality/performance.
+    /// Disabled if `None`.
+    pub msaa: Option<u32>,
     /// Whether a monitor refresh must be waited between frames.
     /// Can decrease the frame rate a lot when struggling around the refresh rate.
     /// If not setted the frame rate is unbounded, which can lead to tearing.
@@ -41,6 +43,7 @@ impl Options {
         glfw.default_window_hints();
         glfw.window_hint(Resizable(false));
         glfw.window_hint(Decorated(self.decorated));
+        glfw.window_hint(Samples(self.msaa));
         glfw.window_hint(ContextVersion(4, 6));
         glfw.window_hint(OpenGlForwardCompat(true));
         glfw.window_hint(OpenGlProfile(glfw::OpenGlProfileHint::Core));
@@ -75,6 +78,10 @@ impl Options {
     fn set_context(&self, glfw: &mut Glfw) {
         glfw.set_swap_interval(SwapInterval::Sync(self.vsync as u32));
         gl::Viewport(0, 0, self.width as i32, self.height as i32);
+        match self.msaa {
+            Some(_) => gl::Enable(gl::MULTISAMPLE),
+            None => gl::Disable(gl::MULTISAMPLE),
+        }
     }
 }
 
@@ -173,7 +180,7 @@ mod tests {
                 title: "Display Test".into(),
                 fullscreen: false,
                 decorated: true,
-                samples: 16,
+                msaa: Some(16),
                 vsync: true,
             },
             // WindowEvent handling...
