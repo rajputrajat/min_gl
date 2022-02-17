@@ -30,7 +30,7 @@ fn main() {
             title: "Display Test".into(),
             fullscreen: false,
             decorated: true,
-            samples: 16,
+            msaa: Some(16),
             vsync: true,
         },
         // WindowEvent handling...
