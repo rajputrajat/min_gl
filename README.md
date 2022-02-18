@@ -45,7 +45,7 @@ fn main() {
     );
 
     // Of course, you can go with more complicated main loops.
-    while !disp.get_window().should_close() {
+    while !disp.window().should_close() {
         // All window events...
         disp.update();
 

@@ -38,7 +38,7 @@ pub struct Options {
 }
 
 impl Options {
-    fn set_hints(&self, glfw: &mut Glfw) {
+    fn config(&self, glfw: &mut Glfw) {
         use glfw::WindowHint::*;
         glfw.default_window_hints();
         glfw.window_hint(Resizable(false));
@@ -75,7 +75,7 @@ impl Options {
         (window, events)
     }
 
-    fn set_context(&self, glfw: &mut Glfw) {
+    fn config_context(&self, glfw: &mut Glfw) {
         glfw.set_swap_interval(SwapInterval::Sync(self.vsync as u32));
         gl::Viewport(0, 0, self.width as i32, self.height as i32);
         match self.msaa {
@@ -114,7 +114,7 @@ where
         let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).expect("Could not initialize the GLFW!");
         let (mut window, events) = glfw.with_primary_monitor(|glfw, monitor| {
             if let Some(monitor) = monitor {
-                opt.set_hints(glfw);
+                opt.config(glfw);
                 opt.create(glfw, monitor)
             } else {
                 panic!("Could not get the primary monitor!");
@@ -123,7 +123,7 @@ where
         window.set_all_polling(true);
         window.make_current();
         gl::load(|proc| glfw.get_proc_address_raw(proc));
-        opt.set_context(&mut glfw);
+        opt.config_context(&mut glfw);
         Self {
             window,
             handler,
@@ -140,20 +140,20 @@ where
 
     /// Polls the [window events](glfw::WindowEvent) and calls the handler.
     pub fn update(&mut self) {
-        self.get_glfw().poll_events();
+        self.glfw().poll_events();
         for (_, event) in glfw::flush_messages(&self.events) {
             (self.handler)(event);
         }
     }
 
     /// Returns the [glfw::Window].
-    pub fn get_window(&mut self) -> &mut Window {
+    pub fn window(&mut self) -> &mut Window {
         &mut self.window
     }
 
     /// Returns the [glfw::Glfw].
-    pub fn get_glfw(&mut self) -> &mut Glfw {
-        &mut self.get_window().glfw
+    pub fn glfw(&mut self) -> &mut Glfw {
+        &mut self.window().glfw
     }
 }
 
@@ -195,7 +195,7 @@ mod tests {
         );
 
         // Of course, you can go with more complicated main loops.
-        while !disp.get_window().should_close() {
+        while !disp.window().should_close() {
             // All window events...
             disp.update();
 
