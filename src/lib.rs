@@ -1,7 +1,3 @@
-use std::sync::mpsc::Receiver;
-
-use glfw::{Context, Glfw, Monitor, SwapInterval, Window, WindowEvent};
-
 /// OpenGL loading code, which is generated using glad v2.0.
 ///
 /// # Safety
@@ -10,6 +6,10 @@ use glfw::{Context, Glfw, Monitor, SwapInterval, Window, WindowEvent};
 /// the unsafe keyword from the macro `func!` that defined the functions.
 /// Thus, all OpenGL calls can be tought of as unsafe!
 pub mod gl;
+
+use glfw::{Context, Glfw, Monitor, SwapInterval, Window, WindowEvent};
+use min_timer::{Now, Sec};
+use std::sync::mpsc::Receiver;
 
 /// Options for creating a display.
 pub struct Options {
@@ -86,19 +86,13 @@ impl Options {
 }
 
 /// [GLFW](glfw) window with valid OpenGL 4.6 CORE context loaded by [GLAD](gl).
-pub struct Display<T>
-where
-    T: FnMut(WindowEvent) -> (),
-{
+pub struct Display<T: FnMut(WindowEvent)> {
     window: Window,
     handler: T,
     events: Receiver<(f64, WindowEvent)>,
 }
 
-impl<T> Display<T>
-where
-    T: FnMut(WindowEvent) -> (),
-{
+impl<T: FnMut(WindowEvent)> Display<T> {
     /// Creates and sets up a new [glfw::Window].
     /// Calls the given [window event](glfw::WindowEvent) handler after polling.
     /// Must be initialized and used on the same thread all the OpenGL calls are done.
@@ -140,20 +134,37 @@ where
 
     /// Polls the [window events](glfw::WindowEvent) and calls the handler.
     pub fn update(&mut self) {
-        self.glfw().poll_events();
+        self.glfw_mut().poll_events();
         for (_, event) in glfw::flush_messages(&self.events) {
             (self.handler)(event);
         }
     }
 
     /// Returns the [glfw::Window].
-    pub fn window(&mut self) -> &mut Window {
-        &mut self.window
+    pub fn window(&self) -> &Window {
+        &self.window
     }
 
     /// Returns the [glfw::Glfw].
-    pub fn glfw(&mut self) -> &mut Glfw {
-        &mut self.window().glfw
+    pub fn glfw(&self) -> &Glfw {
+        &self.window().glfw
+    }
+
+    /// Returns the [glfw::Window] mutably.
+    pub fn window_mut(&mut self) -> &mut Window {
+        &mut self.window
+    }
+
+    /// Returns the [glfw::Glfw] mutably.
+    pub fn glfw_mut(&mut self) -> &mut Glfw {
+        &mut self.window_mut().glfw
+    }
+}
+
+#[cfg(feature = "min_timer")]
+impl<T: FnMut(WindowEvent)> Now for Display<T> {
+    fn now(&self) -> Sec {
+        Sec::from(self.glfw().get_time())
     }
 }
 
