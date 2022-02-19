@@ -7,8 +7,11 @@
 /// Thus, all OpenGL calls can be tought of as unsafe!
 pub mod gl;
 
+/// [min_timer::Now] implementation.
+#[cfg(feature = "min_timer")]
+pub mod now;
+
 use glfw::{Context, Glfw, Monitor, SwapInterval, Window, WindowEvent};
-use min_timer::{Now, Sec};
 use std::sync::mpsc::Receiver;
 
 /// Options for creating a display.
@@ -158,13 +161,6 @@ impl<T: FnMut(WindowEvent)> Display<T> {
     /// Returns the [glfw::Glfw] mutably.
     pub fn glfw_mut(&mut self) -> &mut Glfw {
         &mut self.window_mut().glfw
-    }
-}
-
-#[cfg(feature = "min_timer")]
-impl<T: FnMut(WindowEvent)> Now for Display<T> {
-    fn now(&self) -> Sec {
-        Sec::from(self.glfw().get_time())
     }
 }
 
