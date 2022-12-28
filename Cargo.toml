@@ -16,5 +16,5 @@ categories = [
 ]
 
 [dependencies]
-glfw = "0.43.0"
+glfw = "0.48.0"
 min_timer = { version = "0.4.0", optional = true }
